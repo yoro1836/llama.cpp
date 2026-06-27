@@ -68,11 +68,6 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - name: Set up Vulkan Sdk
-        run: |
-          git clone https://github.com/KhronosGroup/Vulkan-Headers -b vulkan-sdk-1.3.275
-          echo "VULKAN_HEADERS=${PWD}/Vulkan-Headers/include" >> $GITHUB_ENV
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
         with:
@@ -88,10 +83,10 @@ jobs:
         run: |
           cmake -B build -G Ninja \
             -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH \
-            -DVulkan_INCLUDE_DIR=${VULKAN_HEADERS} \
+            -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH
             -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a \
-            -DANDROID_PLATFORM=android-28 \
+           -DANDROID_PLATFORM=android-28 \
             -DLLAMA_FATAL_WARNINGS=ON \
             -DGGML_BACKEND_DL=OFF \
             ​-DBUILD_SHARED_LIBS=OFF \
