@@ -95,7 +95,10 @@ jobs:
             -DCMAKE_C_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
             -DCMAKE_CXX_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
             -DGGML_NATIVE=OFF \
-            -DGGML_CPU_ALL_VARIANTS=ON \
+            -DGGML_CPU_ARM_ARCH=armv9.2-a+dotprod+fp16+sve+i8mm+sve2 \
+            -DGGML_CPU_KLEIDIAI=ON \
+            -DGGML_NEON=ON \
+            -DGGML_ARM_FMA=ON
             -DGGML_OPENMP=OFF \
             -DGGML_OPENCL=OFF \
             -DGGML_VULKAN=ON \
