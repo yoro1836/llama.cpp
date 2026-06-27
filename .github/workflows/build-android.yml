@@ -92,8 +92,8 @@ jobs:
             -DLLAMA_LTO=ON \
             -DLLAMA_BUILD_TESTS=OFF \
             -DLLAMA_BUILD_EXAMPLES=ON \
-            -DCMAKE_C_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
-            -DCMAKE_CXX_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
+            -DCMAKE_C_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only -I/usr/include" \
+            -DCMAKE_CXX_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only -I/usr/include" \
             -DGGML_NATIVE=OFF \
             -DGGML_CPU_ARM_ARCH=armv9.2-a+dotprod+fp16+sve+i8mm+sve2 \
             -DGGML_CPU_KLEIDIAI=ON \
