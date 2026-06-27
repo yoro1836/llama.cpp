@@ -46,8 +46,7 @@ jobs:
       - name: Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ninja-build vulkan-tools libvulkan-dev vulkan-validationlayers spirv-tools spirv-headers glslang-dev glslang-tools glslc
-
+          sudo apt-get install -y build-essential ninja-build vulkan-tools libvulkan-dev spirv-tools glslang-dev glslang-tools glslc
 
       # note : disabled to spare some cache space (https://github.com/ggml-org/llama.cpp/pull/23789)
       #        for some reason, the ccache does not improve the build time in this case
@@ -92,7 +91,7 @@ jobs:
         id: cmake_build
         run: |
           cmake -B build -G Ninja \
-            -DSPIRV_INCLUDE_DIR=${SPIRV_HEADERS} \
+            -DSPIRV-Headers_DIR=${SPIRV_HEADERS} \
             -DVulkan_INCLUDE_DIR=${VULKAN_HEADERS} \
             -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
             -DANDROID_ABI=arm64-v8a \
