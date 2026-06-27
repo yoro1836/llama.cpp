@@ -94,7 +94,7 @@ jobs:
       - name: Build
         id: cmake_build
         run: |
-          cmake -B build \
+          cmake -B build -G Ninja \
             -DSPIRV-Headers_DIR=${SPIRV_HEADERS} \
             -DVulkan_INCLUDE_DIR=${VULKAN_HEADERS} \
             -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
