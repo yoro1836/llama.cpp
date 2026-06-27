@@ -1,8 +1,6 @@
 name: Aarch64 GNU Fully Static Build with Mold (llama.cpp)
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -18,7 +16,6 @@ jobs:
     - name: Install Build Tools, Aarch64 Toolchain and Mold
       run: |
         sudo apt-get update
-        # 크로스 컴파일러, 정적 라이브러리 및 mold 링커 설치
         sudo apt-get install -y cmake ninja-build ccache mold g++-aarch64-linux-gnu gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
     - name: Configure CMake with Mold and Custom Flags
@@ -28,7 +25,10 @@ jobs:
           -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
           -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
           -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
-          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_FIND_ROOT_PATH=/usr/aarch64-linux-gnu \
+          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
+          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
           -DBUILD_SHARED_LIBS=OFF \
           -DGGML_OPENCL=OFF \
           -DGGML_VULKAN=ON \
@@ -36,8 +36,8 @@ jobs:
           -DGGML_CCACHE=ON \
           -DGGML_NATIVE=OFF \
           -DLLAMA_CURL=OFF \
-          -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold -static" \
-          -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold -Xlinker --target=aarch64-linux-gnu -static" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold -Xlinker --target=aarch64-linux-gnu" \
           -DCMAKE_C_FLAGS="-march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only" \
           -DCMAKE_CXX_FLAGS="-march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only"
 
@@ -45,10 +45,8 @@ jobs:
       run: |
         cmake --build build --config Release
 
-    - name: Upload Fully Static Aarch64 Binary
+    - name: Upload All Static Aarch64 Binaries
       uses: actions/upload-artifact@v4
       with:
-        name: llama-android-static-mold-executable
-        path: |
-          build/bin/llama-cli
-          build/bin/llama-server
+        name: llama-android-all-static-binaries
+        path: build/bin/
