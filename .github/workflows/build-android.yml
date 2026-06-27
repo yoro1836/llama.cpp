@@ -75,7 +75,7 @@ jobs:
       - name: Set up Spir-V Headers
         run: |
           git clone https://github.com/KhronosGroup/Spirv-headers
-          echo "SPIRV_HEADERS=${PWD}/Spirv-Headers/include/spirv/unified1" >> $GITHUB_ENV
+          echo "SPIRV_HEADERS=${PWD}/Spirv-Headers/include" >> $GITHUB_ENV
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
@@ -91,7 +91,6 @@ jobs:
         id: cmake_build
         run: |
           cmake -B build -G Ninja \
-            -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH \
             -DSPIRV-Headers_DIR=${SPIRV_HEADERS} \
             -DVulkan_INCLUDE_DIR=${VULKAN_HEADERS} \
             -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
