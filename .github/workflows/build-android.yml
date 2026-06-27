@@ -78,7 +78,7 @@ jobs:
           cd Spirv-headers
           cmake -B build -DCMAKE_INSTALL_PREFIX=$(pwd)/stage
           cmake --build build --target install
-          echo "SPIRV_HEADERS=${PWD}/stage/share/cmake/SPIRV-Headers/SPIRV-HeadersConfig.cmake" >> $GITHUB_ENV
+          echo "SPIRV_HEADERS=${PWD}/stage/share/cmake/SPIRV-Headers" >> $GITHUB_ENV
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
