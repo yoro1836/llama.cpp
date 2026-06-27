@@ -1,0 +1,54 @@
+name: Aarch64 GNU Fully Static Build with Mold (llama.cpp)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  aarch64-static-mold-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Build Tools, Aarch64 Toolchain and Mold
+      run: |
+        sudo apt-get update
+        # 크로스 컴파일러, 정적 라이브러리 및 mold 링커 설치
+        sudo apt-get install -y cmake ninja-build ccache mold g++-aarch64-linux-gnu gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+
+    - name: Configure CMake with Mold and Custom Flags
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_SYSTEM_NAME=Linux \
+          -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+          -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+          -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DGGML_OPENCL=OFF \
+          -DGGML_VULKAN=ON \
+          -DGGML_LLAMAFILE=ON \
+          -DGGML_CCACHE=ON \
+          -DGGML_NATIVE=OFF \
+          -DLLAMA_CURL=OFF \
+          -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold -static" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" \
+          -DCMAKE_C_FLAGS="-march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only" \
+          -DCMAKE_CXX_FLAGS="-march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only"
+
+    - name: Build with Ninja
+      run: |
+        cmake --build build --config Release
+
+    - name: Upload Fully Static Aarch64 Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: llama-android-static-mold-executable
+        path: |
+          build/bin/llama-cli
+          build/bin/llama-server
