@@ -102,3 +102,10 @@ jobs:
             -DLLAMA_BUILD_BORINGSSL=ON \
             -DGGML_RPC=ON
           time cmake --build build --config Release -j $(nproc)
+          
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-android-vulkan
+          path: build/bin/
+          if-no-files-found: error
