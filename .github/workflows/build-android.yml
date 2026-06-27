@@ -79,6 +79,7 @@ jobs:
           cmake -B build -DCMAKE_INSTALL_PREFIX=$(pwd)/stage
           cmake --build build --target install
           echo "SPIRV_HEADERS=${PWD}/stage/share/cmake/SPIRV-Headers" >> $GITHUB_ENV
+          echo "SPIRV_INCLUDE_PATH=${PWD}/include" >> $GITHUB_ENV
       
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
@@ -105,8 +106,8 @@ jobs:
             -DLLAMA_LTO=ON \
             -DLLAMA_BUILD_TESTS=OFF \
             -DLLAMA_BUILD_EXAMPLES=ON \
-            -DCMAKE_C_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
-            -DCMAKE_CXX_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only" \
+            -DCMAKE_C_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only -I${SPIRV_INCLUDE_PATH}" \
+            -DCMAKE_CXX_FLAGS="-O3 -gsplit-dwarf -g0 -gline-tables-only -I${SPIRV_INCLUDE_PATH}" \
             -DGGML_NATIVE=OFF \
             -DGGML_CPU_ARM_ARCH=armv9.2-a+dotprod+fp16+sve+i8mm+sve2 \
             -DGGML_CPU_KLEIDIAI=ON \
