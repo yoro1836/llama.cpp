@@ -1,4 +1,4 @@
-name: Aarch64 GNU Fully Static Build with Mold (llama.cpp)
+name: Aarch64 Clang Fully Static Build with Mold (llama.cpp)
 
 on:
   workflow_dispatch:
@@ -13,27 +13,39 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Build Tools, Aarch64 Toolchain and Mold
+    - name: Install Build Tools, Aarch64 Sysroot and Mold
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake ninja-build ccache mold g++-aarch64-linux-gnu gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+        sudo apt-get install -y cmake ninja-build ccache mold clang lld libc6-dev-arm64-cross gcc-aarch64-linux-gnu
 
-    - name: Configure CMake with Mold and Custom Flags
+    - name: Configure CMake with Clang, Mold and Custom Flags
       run: |
         cmake -B build -G Ninja \
           -DCMAKE_SYSTEM_NAME=Linux \
           -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
-          -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
-          -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
-          -DCMAKE_FIND_ROOT_PATH=/usr/aarch64-linux-gnu \
-          -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
-          -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
-          -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
           -DBUILD_SHARED_LIBS=OFF \
           -DGGML_OPENCL=OFF \
           -DGGML_VULKAN=ON \
           -DGGML_LLAMAFILE=ON \
           -DGGML_CCACHE=ON \
+          -DGGML_NATIVE=OFF \
+          -DLLAMA_CURL=OFF \
+          -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold -target aarch64-linux-gnu -static --sysroot=/usr/aarch64-linux-gnu" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold -target aarch64-linux-gnu --sysroot=/usr/aarch64-linux-gnu" \
+          -DCMAKE_C_FLAGS="-target aarch64-linux-gnu --sysroot=/usr/aarch64-linux-gnu -march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only" \
+          -DCMAKE_CXX_FLAGS="-target aarch64-linux-gnu --sysroot=/usr/aarch64-linux-gnu -march=armv9.2-a+i8mm+bf16+dotprod+crypto+sve+sve2 -O3 -gsplit-dwarf -g0 -gline-tables-only"
+
+    - name: Build with Ninja
+      run: |
+        cmake --build build --config Release
+
+    - name: Upload All Static Aarch64 Binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: llama-android-static-mold-executable
+        path: build/bin/
           -DGGML_NATIVE=OFF \
           -DLLAMA_CURL=OFF \
           -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold -Xlinker --target=aarch64-linux-gnu -static" \
