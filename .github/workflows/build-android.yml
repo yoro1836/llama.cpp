@@ -98,12 +98,12 @@ jobs:
             -DGGML_CPU_ARM_ARCH=armv9.2-a+dotprod+fp16+sve+i8mm+sve2 \
             -DGGML_CPU_KLEIDIAI=ON \
             -DGGML_NEON=ON \
-            -DGGML_ARM_FMA=ON
+            -DGGML_ARM_FMA=ON \
             -DGGML_OPENMP=OFF \
             -DGGML_OPENCL=OFF \
             -DGGML_VULKAN=ON \
             -DLLAMA_BUILD_BORINGSSL=ON \
-            -DGGML_RPC=ON
+            -DGGML_RPC=ON 
           time cmake --build build --config Release -j $(nproc)
           
       - name: Upload Artifacts
